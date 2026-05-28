@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>생활 속 SW 문제 해결 — SW 캠프</title>
+<style>
+:root{
+  --blue:#3B6FD4;--blue-bg:#EBF0FB;--blue-bd:#C3D1F0;
+  --amber:#C17E20;--amber-bg:#FFF8EC;--amber-bd:#F5D18A;
+  --green:#237D52;--green-bg:#EDFAF3;--green-bd:#9ADCC0;
+  --purple:#6B4FD4;--purple-bg:#F0EDFB;--purple-bd:#C8BFEF;
+  --red:#C0392B;--red-bg:#FDECEA;
+  --text:#1A1A2E;--text2:#4B5563;--gray:#6B7280;
+  --bg:#F2F4F8;--white:#fff;--border:#E2E6EE;
+  --r:12px;--rs:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:16px}
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:6px;position:sticky;top:0;z-index:100;height:52px;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.nl{font-weight:700;font-size:15px;color:var(--blue);margin-right:12px;white-space:nowrap}
+.nb{padding:6px 14px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--gray);font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.nb.on{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+.nb:hover:not(.on){background:var(--blue-bg);color:var(--blue);border-color:var(--blue)}
+.page{display:none;padding:24px;max-width:860px;margin:0 auto}
+.page.on{display:block}
+.hero{text-align:center;padding:40px 16px 32px}
+.hero h1{font-size:28px;font-weight:700;margin-bottom:10px}
+.hero p{font-size:16px;color:var(--text2);margin-bottom:36px}
+.hcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;max-width:780px;margin:0 auto}
+.hcard{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:22px 18px;cursor:pointer;text-align:left;transition:all .18s}
+.hcard:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 4px 16px rgba(59,111,212,.12)}
+.hcard-ico{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.hcard h2{font-size:15px;font-weight:600;margin-bottom:5px}
+.hcard p{font-size:13px;color:var(--text2);line-height:1.5}
+.pg-title{font-size:20px;font-weight:700;margin-bottom:4px}
+.pg-sub{font-size:13px;color:var(--gray);margin-bottom:20px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.tab{padding:7px 15px;border:1px solid var(--border);border-radius:20px;background:var(--white);color:var(--gray);font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s}
+.tab.on{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600}
+.tab:hover:not(.on){border-color:var(--blue);color:var(--blue)}
+.prob{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:14px}
+.prob-lbl{font-size:11px;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.prob-txt{font-size:16px;font-weight:600}
+.flow{display:flex;align-items:stretch;margin-bottom:0}
+.fs{flex:1;border:1px solid var(--border);padding:14px 10px 12px;text-align:center;min-width:0}
+.fs:first-child{border-radius:var(--r) 0 0 var(--r)}.fs:last-child{border-radius:0 var(--r) var(--r) 0}
+.fs-arr{display:flex;align-items:center;padding:0 4px;color:var(--gray);font-size:18px;flex-shrink:0}
+.fs-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.fs-main{font-size:14px;font-weight:600;color:var(--text)}.fs-sub{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4}
+.fs.bl{background:var(--blue-bg);border-color:var(--blue-bd)}.fs.bl .fs-lbl{color:var(--blue)}
+.fs.am{background:var(--amber-bg);border-color:var(--amber-bd)}.fs.am .fs-lbl{color:var(--amber)}
+.fs.gr{background:var(--green-bg);border-color:var(--green-bd)}.fs.gr .fs-lbl{color:var(--green)}
+.stabs{display:flex;gap:8px;margin-bottom:18px}
+.st{flex:1;padding:12px 8px;border:1.5px solid var(--border);border-radius:var(--r);background:var(--white);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s}
+.st:hover{border-color:var(--blue)}.st.on-bl{background:var(--blue-bg);border-color:var(--blue)}.st.on-am{background:var(--amber-bg);border-color:var(--amber)}.st.on-gr{background:var(--green-bg);border-color:var(--green)}
+.st-nm{font-size:13px;font-weight:600;color:var(--text)}.st-tg{font-size:11px;color:var(--gray);margin-top:2px}
+.shero{border-radius:var(--r);padding:16px 18px;margin-bottom:14px;border:1px solid var(--border)}
+.sh-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.sh-name{font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px}.sh-how{font-size:14px;color:var(--text2);line-height:1.55}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.ac{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px}
+.ac-wh{font-size:11px;color:var(--gray);margin-bottom:3px}.ac-nm{font-size:13px;font-weight:600;margin-bottom:8px}
+.ac-dv{height:1px;background:var(--border);margin-bottom:7px}.ac-rl{font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.ac-ro{font-size:12px;color:var(--text2);line-height:1.4}
+.cbox{border-radius:10px;padding:14px 16px;border:1px solid var(--border)}.c-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}.c-txt{font-size:14px;line-height:1.55}
+.qhdr{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.qbar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.qbar{height:100%;background:var(--blue);border-radius:3px;transition:width .4s ease;width:0}
+.qsc{font-size:15px;font-weight:700;color:var(--blue);white-space:nowrap}
+.qnum{font-size:12px;color:var(--gray);margin-bottom:14px}
+.qcard{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:24px 22px;margin-bottom:16px}
+.qtype{font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.qtxt{font-size:19px;font-weight:700;line-height:1.4}
+.qhint{font-size:13px;color:var(--gray);margin-top:10px;padding:8px 12px;background:var(--bg);border-radius:8px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.opt{padding:16px 14px;border:1.5px solid var(--border);border-radius:10px;background:var(--white);cursor:pointer;text-align:left;font-size:15px;font-weight:500;color:var(--text);font-family:inherit;line-height:1.35;transition:all .15s}
+.opt:hover:not([disabled]){border-color:var(--blue);background:var(--blue-bg);color:var(--blue)}
+.opt.ok{background:var(--green-bg);border-color:var(--green);color:var(--green)}.opt.no{background:var(--red-bg);border-color:var(--red);color:var(--red)}.opt:disabled{cursor:default}
+.reveal{display:none;background:var(--bg);border-radius:var(--r);padding:18px;margin-bottom:16px;animation:fi .3s ease}.reveal.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.rv-title{font-size:14px;font-weight:700;margin-bottom:10px}
+.rv-ex{font-size:14px;color:var(--text2);line-height:1.6;padding:10px 14px;background:var(--white);border-radius:8px;border-left:3px solid var(--blue);margin-bottom:14px}
+.mflow{display:flex;align-items:stretch}.mf{flex:1;border:1px solid var(--border);padding:10px 8px;text-align:center;min-width:0}
+.mf:first-child{border-radius:8px 0 0 8px}.mf:last-child{border-radius:0 8px 8px 0}
+.mf-sep{display:flex;align-items:center;padding:0 3px;color:var(--gray);font-size:14px;flex-shrink:0}
+.mf-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.mf-txt{font-size:12px;color:var(--text);line-height:1.35;white-space:pre-line}
+.mf.bl{background:var(--blue-bg);border-color:var(--blue-bd)}.mf.bl .mf-lbl{color:var(--blue)}
+.mf.am{background:var(--amber-bg);border-color:var(--amber-bd)}.mf.am .mf-lbl{color:var(--amber)}
+.mf.gr{background:var(--green-bg);border-color:var(--green-bd)}.mf.gr .mf-lbl{color:var(--green)}
+.next{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}.next:hover{background:#2E5BB8}
+.final{text-align:center;padding:40px 16px}
+.fcircle{width:130px;height:130px;border-radius:50%;border:4px solid var(--blue);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 24px}
+.fnum{font-size:38px;font-weight:800;color:var(--blue);line-height:1}.fdenom{font-size:14px;color:var(--gray)}
+.fmsg{font-size:22px;font-weight:700;margin-bottom:6px}.fsub{font-size:15px;color:var(--text2);margin-bottom:32px}
+.fbtn{padding:12px 28px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin:0 5px}
+.fbtn.fill{background:var(--blue);color:#fff;border:none}.fbtn.out{background:transparent;color:var(--blue);border:2px solid var(--blue)}.fbtn:hover{opacity:.88}
+/* CT */
+.ct-intro{border-radius:var(--r);padding:14px 18px;margin-bottom:18px;border:1px solid var(--border)}
+.ct-itag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.ct-iname{font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px}
+.ct-idesc{font-size:14px;color:var(--text2);line-height:1.55}
+.ct-sit{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:12px}
+.ct-slbl{font-size:11px;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.ct-stxt{font-size:15px;font-weight:600}
+.ct-instr{font-size:14px;color:var(--text2);margin-bottom:14px;padding:10px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--rs);border-left:3px solid var(--blue)}
+.ct-igrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.ct-item{padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--white);cursor:pointer;text-align:left;font-size:14px;font-weight:500;color:var(--text);font-family:inherit;line-height:1.35;transition:all .15s}
+.ct-item:hover:not(:disabled){border-color:var(--blue);background:var(--blue-bg)}
+.ct-item.sel{border-color:var(--blue);background:var(--blue-bg);color:var(--blue)}
+.ct-item.ok{border-color:var(--green)!important;background:var(--green-bg)!important;color:var(--green)!important}
+.ct-item.no{border-color:var(--red)!important;background:var(--red-bg)!important;color:var(--red)!important}
+.ct-item.miss{border-color:var(--amber)!important;background:var(--amber-bg)!important;color:var(--amber)!important}
+.ct-item:disabled{cursor:default}
+.ct-act{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;transition:background .15s}
+.ct-act:hover{background:#2E5BB8}.ct-act.dim{background:var(--border);color:var(--gray);cursor:default}
+.ct-done{background:var(--green-bg);border:1px solid var(--green-bd);border-radius:var(--rs);padding:14px 16px;font-size:14px;color:var(--green);line-height:1.5;margin-bottom:10px;display:none;animation:fi .3s ease}
+.ct-retry{background:var(--amber-bg);border:1px solid var(--amber-bd);border-radius:var(--rs);padding:12px 16px;font-size:13px;color:var(--amber);margin-bottom:10px;display:none}
+.ct-rst{padding:8px 18px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--gray);font-size:13px;cursor:pointer;font-family:inherit;display:none}
+.ct-rst:hover{background:var(--bg);color:var(--text)}
+/* Sort */
+.sort-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.sort-item{background:var(--white);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;transition:border-color .15s}
+.sort-item.ok{border-color:var(--green)}.sort-item.no{border-color:var(--red)}
+.sort-itxt{font-size:13px;font-weight:500;color:var(--text);margin-bottom:8px}
+.sort-btns{display:flex;gap:6px}
+.sort-btn{flex:1;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;background:transparent;color:var(--gray);transition:all .15s}
+.sort-btn:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
+.sort-btn.y.act{background:var(--blue-bg);border-color:var(--blue);color:var(--blue)}
+.sort-btn.n.act{background:var(--bg);border-color:var(--gray);color:var(--gray)}
+.sort-item.ok .sort-btn.act{background:var(--green-bg)!important;border-color:var(--green)!important;color:var(--green)!important}
+.sort-item.no .sort-btn.act{background:var(--red-bg)!important;border-color:var(--red)!important;color:var(--red)!important}
+/* Pattern */
+.pat-flows{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.pat-flow{background:var(--white);border:1px solid var(--border);border-radius:var(--rs);padding:12px;text-align:center}
+.pat-ftitle{font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px}
+.pat-step{font-size:11px;padding:5px 6px;border-radius:5px;margin-bottom:4px;line-height:1.3}
+.ps{background:var(--blue-bg);color:var(--blue)}.pj{background:var(--amber-bg);color:var(--amber)}.pa{background:var(--green-bg);color:var(--green)}
+.pat-arrow{font-size:10px;color:var(--gray);text-align:center;margin:2px 0}
+.pat-q{font-size:16px;font-weight:700;color:var(--text);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.pat-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.pat-opt{padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--white);cursor:pointer;font-size:14px;font-weight:500;color:var(--text);font-family:inherit;text-align:left;transition:all .15s}
+.pat-opt:hover:not(:disabled){border-color:var(--blue);background:var(--blue-bg)}
+.pat-opt.ok{border-color:var(--green);background:var(--green-bg);color:var(--green)}.pat-opt.no{border-color:var(--red);background:var(--red-bg);color:var(--red)}.pat-opt:disabled{cursor:default}
+.pat-ex{font-size:13px;color:var(--text2);line-height:1.5;padding:10px 14px;background:var(--white);border-left:3px solid var(--blue);border-radius:var(--rs);margin-bottom:12px;display:none}
+.pat-next{padding:10px 24px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:none}.pat-next:hover{background:#2E5BB8}
+/* Sequence */
+.seq-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.seq-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--white);cursor:pointer;font-size:14px;font-weight:500;color:var(--text);font-family:inherit;text-align:left;transition:all .15s;width:100%}
+.seq-item:hover:not(:disabled){border-color:var(--blue);background:var(--blue-bg)}
+.seq-item.picked{border-color:var(--blue);background:var(--blue-bg)}
+.seq-item.ok{border-color:var(--green);background:var(--green-bg);color:var(--green)}
+.seq-item.no{border-color:var(--red);background:var(--red-bg);color:var(--red)}
+.seq-item:disabled{cursor:default}
+.seq-num{width:28px;height:28px;min-width:28px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--gray);background:var(--bg);flex-shrink:0}
+.seq-item.picked .seq-num{background:var(--blue);border-color:var(--blue);color:#fff}
+.seq-item.ok .seq-num{background:var(--green);border-color:var(--green);color:#fff}
+.seq-item.no .seq-num{background:var(--red);border-color:var(--red);color:#fff}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nl">SW 캠프</span>
+  <button class="nb on" onclick="show('home',this)">홈</button>
+  <button class="nb" onclick="show('ex',this)">문제 해결 예시</button>
+  <button class="nb" onclick="show('sen',this)">센서 탐구</button>
+  <button class="nb" onclick="show('ct',this)">컴퓨팅 사고력</button>
+  <button class="nb" onclick="show('quiz',this);startQuiz()">퀴즈 도전</button>
+</nav>
+
+<div id="p-home" class="page on">
+  <div class="hero">
+    <h1>생활 속 SW 문제 해결</h1>
+    <p>센서와 컴퓨팅 사고력으로 우리 생활의 문제를 해결해보자!</p>
+    <div class="hcards">
+      <div class="hcard" onclick="show('ex',null)">
+        <div class="hcard-ico" style="background:var(--blue-bg)"><svg width="20" height="20" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <h2>문제 해결 예시</h2><p>감지 → 판단 → 실행, 10가지 예시 살펴보기</p>
+      </div>
+      <div class="hcard" onclick="show('sen',null)">
+        <div class="hcard-ico" style="background:var(--amber-bg)"><svg width="20" height="20" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg></div>
+        <h2>센서 탐구</h2><p>한 가지 센서의 다양한 활용 살펴보기</p>
+      </div>
+      <div class="hcard" onclick="show('ct',null)">
+        <div class="hcard-ico" style="background:var(--purple-bg)"><svg width="20" height="20" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
+        <h2>컴퓨팅 사고력</h2><p>문제 분해 · 추상화 · 패턴 인식 · 알고리즘 실습</p>
+      </div>
+      <div class="hcard" onclick="show('quiz',null);startQuiz()">
+        <div class="hcard-ico" style="background:var(--green-bg)"><svg width="20" height="20" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+        <h2>퀴즈 도전</h2><p>배운 내용으로 10문제 풀어보기!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="p-ex" class="page">
+  <div class="pg-title">문제 해결 예시</div>
+  <div class="pg-sub">탭을 눌러 각 상황의 감지 → 판단 → 실행 흐름을 확인하세요</div>
+  <div class="tabs" id="ex-tabs"></div>
+  <div class="prob"><div class="prob-lbl">문제 상황</div><div class="prob-txt" id="ex-prob"></div></div>
+  <div class="flow" id="ex-flow"></div>
+</div>
+
+<div id="p-sen" class="page">
+  <div class="pg-title">한 가지 센서, 다양한 활용</div>
+  <div class="pg-sub">같은 센서가 어떻게 완전히 다른 제품이 되는지 확인해보세요</div>
+  <div class="stabs" id="s-tabs"></div>
+  <div id="s-body"></div>
+</div>
+
+<div id="p-ct" class="page">
+  <div class="pg-title">컴퓨팅 사고력 실습</div>
+  <div class="pg-sub">SW로 문제를 해결하는 사고방식 4가지를 직접 해봐요!</div>
+  <div class="tabs" id="ct-tabs"></div>
+  <div id="ct-body"></div>
+</div>
+
+<div id="p-quiz" class="page">
+  <div id="qz-main">
+    <div class="qhdr"><div class="qbar-wrap"><div class="qbar" id="qbar"></div></div><div class="qsc" id="qsc">0점</div></div>
+    <div class="qnum" id="qnum"></div>
+    <div class="qcard"><div class="qtype" id="qtype"></div><div class="qtxt" id="qtxt"></div><div class="qhint" id="qhint"></div></div>
+    <div class="opts" id="opts"></div>
+    <div class="reveal" id="reveal"><div class="rv-title">정답 해설</div><div class="rv-ex" id="rv-ex"></div><div class="mflow" id="mflow"></div></div>
+    <button class="next" id="next-btn" onclick="nextQ()" style="display:none">다음 문제 →</button>
+  </div>
+  <div id="qz-final" style="display:none">
+    <div class="final">
+      <div class="fcircle"><div class="fnum" id="f-sc"></div><div class="fdenom" id="f-dn"></div></div>
+      <div class="fmsg" id="f-msg"></div><div class="fsub" id="f-sub"></div>
+      <button class="fbtn fill" onclick="startQuiz()">다시 도전</button>
+      <button class="fbtn out" onclick="show('home',null)">홈으로</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('p-'+id).classList.add('on');
+  if(btn)btn.classList.add('on');
+  else{const m={home:'홈',ex:'예시',sen:'센서',ct:'컴퓨팅',quiz:'퀴즈'};document.querySelectorAll('.nb').forEach(b=>{if(b.textContent.includes(m[id]||''))b.classList.add('on')});}
+}
+
+const EX=[
+  {t:'센서등',p:'어두운 골목 — 늦은 밤 귀갓길이 무섭고 위험함',s:[{c:'bl',l:'감지',m:'조도+움직임 센서',s:'밝기 낮고 사람 접근'},{c:'am',l:'판단',m:'어둡고 움직임 있나?',s:'두 조건 모두 충족'},{c:'gr',l:'실행',m:'전등 켜기',s:'일정 시간 후 꺼짐'}]},
+  {t:'자동문',p:'양손에 짐을 들고 마트 문을 못 열어서 불편함',s:[{c:'bl',l:'감지',m:'적외선 센서',s:'사람이 일정 거리 이내 접근'},{c:'am',l:'판단',m:'가까이 있나?',s:'거리 < 80cm'},{c:'gr',l:'실행',m:'문 자동으로 열기',s:'지나가면 다시 닫힘'}]},
+  {t:'스마트 쓰레기통',p:'쓰레기통이 넘쳐도 아무도 모름 — 악취와 미관 문제',s:[{c:'bl',l:'감지',m:'초음파 거리 센서',s:'쓰레기 높이 측정'},{c:'am',l:'판단',m:'가득 찼나?',s:'높이 > 90%'},{c:'gr',l:'실행',m:'관리자 앱 알림',s:'수거 위치 함께 전송'}]},
+  {t:'스쿨존 경고판',p:'어린이보호구역에서 자동차가 너무 빠르게 달림',s:[{c:'bl',l:'감지',m:'레이더 속도 센서',s:'차량 속도 측정'},{c:'am',l:'판단',m:'제한속도 초과?',s:'속도 > 30km/h'},{c:'gr',l:'실행',m:'경고판 LED 점멸',s:'"속도를 줄이세요" 표시'}]},
+  {t:'스마트 화분',p:'학교 화단 꽃이 말라 죽음 — 물 주는 걸 자꾸 잊음',s:[{c:'bl',l:'감지',m:'토양 수분 센서',s:'흙 수분 함량 측정'},{c:'am',l:'판단',m:'물이 부족한가?',s:'수분 < 기준값'},{c:'gr',l:'실행',m:'자동으로 물 공급',s:'충분해지면 자동 중단'}]},
+  {t:'자동 손 세정제',p:'공용 세정제를 손으로 눌러쓰다 보니 세균이 다시 묻음',s:[{c:'bl',l:'감지',m:'적외선 센서',s:'손이 노즐 아래 있는지'},{c:'am',l:'판단',m:'손이 있나?',s:'거리 < 5cm'},{c:'gr',l:'실행',m:'세정제 자동 분사',s:'0.5초 후 멈춤'}]},
+  {t:'화재 스프링클러',p:'불이 났을 때 사람이 없으면 초기 진화를 못 함',s:[{c:'bl',l:'감지',m:'온도+연기 센서',s:'온도와 연기 농도 측정'},{c:'am',l:'판단',m:'화재인가?',s:'온도>68°C 또는 연기>기준'},{c:'gr',l:'실행',m:'스프링클러 작동',s:'소방서 자동 신고'}]},
+  {t:'주차장 빈자리',p:'주차장에서 빈자리 찾으려고 한참 돌아다녀야 함',s:[{c:'bl',l:'감지',m:'초음파/압력 센서',s:'각 칸에 차가 있는지'},{c:'am',l:'판단',m:'자리가 비었나?',s:'센서값 = 없음'},{c:'gr',l:'실행',m:'안내 표시등 초록불',s:'차 들어오면 빨간불'}]},
+  {t:'버스 도착 안내',p:'버스가 언제 오는지 몰라 정류장에서 하염없이 기다림',s:[{c:'bl',l:'감지',m:'GPS 위치 센서',s:'버스 실시간 위치 수신'},{c:'am',l:'판단',m:'몇 분 후 도착?',s:'위치+속도로 계산'},{c:'gr',l:'실행',m:'전광판 도착 표시',s:'"3분 후 도착" 안내'}]},
+  {t:'스마트 에어컨',p:'사람이 없는 교실 에어컨이 계속 켜져 에너지 낭비',s:[{c:'bl',l:'감지',m:'PIR 인체 감지 센서',s:'사람 체온·움직임 감지'},{c:'am',l:'판단',m:'사람이 있나?',s:'10분 이상 감지 없음'},{c:'gr',l:'실행',m:'에어컨 자동 꺼짐',s:'사람 오면 자동 켜짐'}]}
+];
+let exi=0;
+function renderEx(i){
+  exi=i;
+  document.getElementById('ex-tabs').innerHTML=EX.map((x,j)=>`<button class="tab${j===i?' on':''}" onclick="renderEx(${j})">${x.t}</button>`).join('');
+  document.getElementById('ex-prob').textContent=EX[i].p;
+  document.getElementById('ex-flow').innerHTML=EX[i].s.map((s,k)=>(k>0?'<div class="fs-arr">→</div>':'')+`<div class="fs ${s.c}"><div class="fs-lbl">${s.l}</div><div class="fs-main">${s.m}</div><div class="fs-sub">${s.s}</div></div>`).join('');
+}
+renderEx(0);
+
+const SN=[
+  {k:'bl',oc:'on-bl',n:'초음파 센서',tg:'핵심: 거리 측정',bg:'var(--blue-bg)',bd:'var(--blue-bd)',tc:'var(--blue)',hw:'아주 높은 음파(초음파)를 쏜 뒤, 물체에 부딪혀 돌아오는 시간으로 거리를 잰다.',cm:'모두 같은 일 — 소리를 쏘고 돌아오는 시간으로 거리를 잰다. 거리 정보를 가지고 무엇을 할지만 다를 뿐!',ap:[{wh:'자동차',nm:'주차 후방 감지',ro:'벽까지 거리에 따라 "삐삐" 속도 변화'},{wh:'드론',nm:'장애물 자동 회피',ro:'사방의 거리를 재서 충돌 전 방향 변경'},{wh:'쓰레기통',nm:'스마트 쓰레기통',ro:'내부 쓰레기 높이로 가득 찼는지 판단'},{wh:'어항·물탱크',nm:'수위 자동 알림',ro:'수면까지 거리로 물이 줄었는지 감지'},{wh:'보조기기',nm:'시각장애인 스마트 지팡이',ro:'앞 장애물 거리 감지해 진동으로 알림'},{wh:'자연 속',nm:'박쥐의 먹이 사냥',ro:'스스로 초음파를 내보내 곤충까지 거리 파악'}]},
+  {k:'am',oc:'on-am',n:'PIR 센서 (적외선)',tg:'핵심: 움직임·체온 감지',bg:'var(--amber-bg)',bd:'var(--amber-bd)',tc:'var(--amber)',hw:'사람 몸에서 나오는 적외선(열)을 감지한다. 움직임이 있으면 열 분포가 바뀌는 것을 포착한다.',cm:'모두 같은 일 — 사람 몸의 열이 움직이는 것을 감지한다. 그 신호를 어디에 쓸지만 다를 뿐!',ap:[{wh:'골목·현관',nm:'센서등',ro:'사람이 지나가면 켜지고 없으면 꺼짐'},{wh:'집·사무실',nm:'도난 경보기',ro:'야간 침입자 감지해 경보 발송'},{wh:'교실·회의실',nm:'스마트 절전 에어컨',ro:'10분 이상 없으면 자동 꺼짐'},{wh:'숲·습지',nm:'야생동물 카메라 트랩',ro:'동물이 지나갈 때만 자동 촬영'},{wh:'공중화장실',nm:'자동 변기',ro:'일어서는 움직임 감지해 자동 작동'},{wh:'박물관·매장',nm:'방문객 자동 집계',ro:'출입 움직임 감지해 방문자 수 파악'}]},
+  {k:'gr',oc:'on-gr',n:'온도 센서',tg:'핵심: 온도 측정',bg:'var(--green-bg)',bd:'var(--green-bd)',tc:'var(--green)',hw:'물질의 온도에 따라 전기 저항이 달라지는 원리를 이용해 온도를 숫자로 변환한다.',cm:'모두 같은 일 — 온도를 숫자로 바꾼다. 그 숫자를 기준값과 비교해서 다른 동작을 할 뿐!',ap:[{wh:'집·건물',nm:'자동 에어컨·보일러',ro:'온도가 설정값 벗어나면 자동 가동·중단'},{wh:'건물 천장',nm:'화재 스프링클러',ro:'68°C 초과 시 물 분사, 소방서 신고'},{wh:'병원·가정',nm:'비접촉 체온계',ro:'피부 적외선으로 체온 0.1초 만에 측정'},{wh:'냉동창고',nm:'식품 온도 관리',ro:'기준 이탈 시 관리자 즉시 알림'},{wh:'자동차 엔진',nm:'과열 방지 시스템',ro:'과열 시 경고등 켜고 냉각팬 작동'},{wh:'스마트팜',nm:'작물 환경 자동 제어',ro:'기온에 따라 온실 창문·난방 조절'}]}
+];
+let sni=0;
+function renderSen(i){
+  sni=i;const d=SN[i];
+  document.getElementById('s-tabs').innerHTML=SN.map((x,j)=>`<button class="st${j===i?' '+x.oc:''}" onclick="renderSen(${j})"><div class="st-nm">${x.n}</div><div class="st-tg">${x.tg}</div></button>`).join('');
+  document.getElementById('s-body').innerHTML=`<div class="shero" style="background:${d.bg};border-color:${d.bd}"><div class="sh-tag" style="color:${d.tc}">${d.tg}</div><div class="sh-name">${d.n}</div><div class="sh-how">${d.hw}</div></div><div style="font-size:11px;color:var(--gray);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">이 센서 하나로 만들 수 있는 것들</div><div class="agrid">${d.ap.map(a=>`<div class="ac"><div class="ac-wh">${a.wh}</div><div class="ac-nm">${a.nm}</div><div class="ac-dv"></div><div class="ac-rl">센서의 역할</div><div class="ac-ro">${a.ro}</div></div>`).join('')}</div><div class="cbox" style="background:${d.bg};border-color:${d.bd}"><div class="c-lbl" style="color:${d.tc}">공통 원리</div><div class="c-txt">${d.cm}</div></div>`;
+}
+renderSen(0);
+
+// ── CT ─────────────────────────────────────────────────────────
+const CT=[
+  {name:'1. 문제 분해',tag:'큰 문제 → 작은 문제',bg:'var(--blue-bg)',bd:'var(--blue-bd)',tc:'var(--blue)',
+   desc:'복잡한 문제를 한 번에 해결하기 어려울 때, 해결 가능한 작은 문제들로 나누면 하나씩 해결할 수 있어요!',
+   type:'select',
+   sit:'우리 동네 버스 정류장에서 사람들이 너무 오래 기다려 불편합니다.',
+   instr:'이 큰 문제를 해결하기 위해 다뤄야 할 작은 문제를 모두 골라봐요!',
+   items:[{t:'버스가 언제 도착하는지 알 수 없다',ok:true},{t:'비·햇볕을 피할 공간이 없다',ok:true},{t:'앉을 의자가 부족하다',ok:true},{t:'배차 간격이 너무 길어 버스가 안 온다',ok:true},{t:'버스의 색깔이 마음에 안 든다',ok:false},{t:'버스 기사님 이름이 뭔지 모른다',ok:false}],
+   done:'잘했어요! 큰 문제를 해결 가능한 작은 문제 4가지로 나눴어요. 이제 각각을 SW로 하나씩 해결할 수 있어요!'},
+  {name:'2. 추상화',tag:'핵심만 남기기',bg:'var(--amber-bg)',bd:'var(--amber-bd)',tc:'var(--amber)',
+   desc:'문제 해결에 꼭 필요한 정보만 남기고 불필요한 것은 과감히 무시해요. 프로그램이 훨씬 간단해져요!',
+   type:'sort',
+   sit:'초음파 센서로 높이를 재서 쓰레기통이 가득 찼는지 알리는 프로그램을 만들려고 해요.',
+   instr:'아래 정보를 "프로그램에 필요한 것"과 "없어도 되는 것"으로 나눠봐요!',
+   items:[{t:'현재 쓰레기 높이 (cm)',ok:true},{t:'쓰레기통의 최대 높이 (기준값)',ok:true},{t:'관리자 연락처',ok:true},{t:'쓰레기를 버린 사람 이름',ok:false},{t:'오늘의 날씨·기온',ok:false},{t:'쓰레기통이 설치된 연도',ok:false}],
+   done:'정확해요! 초음파 센서는 높이만 재면 돼요. 나머지는 없어도 프로그램이 잘 돌아가요. 이것이 추상화예요!'},
+  {name:'3. 패턴 인식',tag:'공통점 찾기',bg:'var(--green-bg)',bd:'var(--green-bd)',tc:'var(--green)',
+   desc:'여러 해결 방법에서 공통 패턴을 찾으면, 새로운 문제도 같은 방식으로 해결할 수 있어요!',
+   type:'pattern',
+   sit:'아래 세 가지 SW 사례를 보고 공통 패턴을 찾아봐요.',
+   examples:[{t:'센서등',f:['밝기+움직임 감지','기준값보다 어두움?','전등 켜기']},{t:'스마트 쓰레기통',f:['쓰레기 높이 감지','90% 이상 찼나?','알림 발송']},{t:'스마트 에어컨',f:['사람 체열 감지','10분간 없었나?','에어컨 꺼짐']}],
+   qs:[
+     {q:'세 가지 사례의 공통 패턴은?',o:['모두 카메라를 사용한다','감지 → 기준 비교 → 자동 실행 구조다','모두 인터넷이 필요하다','모두 경고음을 낸다'],a:1,ex:'"감지 → 기준값 비교 → 자동 실행" 구조가 세 사례 모두에서 나타나요! 이 패턴이 SW 문제 해결의 핵심이에요.'},
+     {q:'이 패턴을 알면 새로운 SW를 만들 때 어떻게 해야 할까?',o:['처음부터 완전히 새로 생각한다','같은 구조에 센서·기준값·실행만 바꿔 적용한다','패턴이 복잡해서 포기한다','인터넷에서 코드를 찾는다'],a:1,ex:'패턴을 알면 "어떤 센서로 감지할까? 기준값은? 실행은?" 3가지만 바꾸면 새로운 SW가 만들어져요!'}
+   ],
+   done:'패턴을 찾았어요! 이 패턴 하나로 센서등도, 자동문도, 에어컨도 같은 방식으로 만들 수 있어요!'},
+  {name:'4. 알고리즘',tag:'순서 있는 해결 방법',bg:'var(--purple-bg)',bd:'var(--purple-bd)',tc:'var(--purple)',
+   desc:'문제를 해결하는 정확한 순서를 만드는 것이에요. 컴퓨터는 이 순서 그대로 실행해요!',
+   type:'sequence',
+   sit:'쓰레기 무단투기 감지 프로그램의 작동 순서를 맞춰봐요!',
+   instr:'아래 단계를 올바른 순서대로 클릭해봐요! 첫 번째 단계부터 클릭하면 번호가 매겨져요.',
+   steps:[{t:'카메라로 주변 움직임 감지하기',ord:1},{t:'현재 시간이 야간인지 확인하기',ord:2},{t:'야간이면서 움직임이 있나? (조건 판단)',ord:3},{t:'경고 안내 방송 켜기',ord:4},{t:'현장 사진 자동 촬영 및 저장',ord:5},{t:'관리자 앱에 위치와 함께 알림 전송',ord:6}],
+   done:'완벽한 알고리즘이에요! 순서가 바뀌면 프로그램이 오작동해요. 정확한 순서가 얼마나 중요한지 알겠죠?'}
+];
+
+let cti=0;
+function renderCT(i){
+  cti=i;
+  const d=CT[i];
+  document.getElementById('ct-tabs').innerHTML=CT.map((x,j)=>`<button class="tab${j===i?' on':''}" onclick="renderCT(${j})">${x.name}</button>`).join('');
+  const intro=`<div class="ct-intro" style="background:${d.bg};border-color:${d.bd}"><div class="ct-itag" style="color:${d.tc}">${d.tag}</div><div class="ct-iname">${d.name}</div><div class="ct-idesc">${d.desc}</div></div><div class="ct-sit"><div class="ct-slbl">문제 상황</div><div class="ct-stxt">${d.sit}</div></div><div class="ct-instr">${d.instr}</div>`;
+  if(d.type==='select')ctSelect(d,intro);
+  else if(d.type==='sort')ctSort(d,intro);
+  else if(d.type==='pattern')ctPattern(d,intro);
+  else if(d.type==='sequence')ctSeq(d,intro);
+}
+
+function ctSelect(d,intro){
+  let sel=new Set();
+  document.getElementById('ct-body').innerHTML=intro+`<div class="ct-igrid" id="ci"></div><button class="ct-act" id="ca" onclick="csVal()">확인하기</button><div class="ct-done" id="cd">${d.done}</div><div class="ct-retry" id="cr">다시 해봐요! 필요 없는 항목을 골랐거나 빠진 것이 있어요. 노란색 = 빠진 것, 빨간색 = 틀린 것</div><button class="ct-rst" id="crst" onclick="renderCT(${cti})">다시 풀기</button>`;
+  d.items.forEach((item,i)=>{
+    const b=document.createElement('button');
+    b.className='ct-item';b.textContent=item.t;b.id='ci'+i;
+    b.onclick=()=>{if(sel.has(i)){sel.delete(i);b.classList.remove('sel');}else{sel.add(i);b.classList.add('sel');}};
+    document.getElementById('ci').appendChild(b);
+  });
+  window.csVal=()=>{
+    let ok=true;
+    d.items.forEach((item,i)=>{
+      const b=document.getElementById('ci'+i);b.disabled=true;b.classList.remove('sel');
+      if(item.ok&&sel.has(i))b.classList.add('ok');
+      else if(!item.ok&&sel.has(i)){b.classList.add('no');ok=false;}
+      else if(item.ok&&!sel.has(i)){b.classList.add('miss');ok=false;}
+    });
+    document.getElementById('ca').style.display='none';
+    document.getElementById('crst').style.display='inline-block';
+    if(ok)document.getElementById('cd').style.display='block';
+    else document.getElementById('cr').style.display='block';
+  };
+}
+
+function ctSort(d,intro){
+  let ans={};
+  document.getElementById('ct-body').innerHTML=intro+`<div class="sort-grid" id="sg"></div><button class="ct-act dim" id="sa" onclick="ssVal()">확인하기 (모두 분류 후 활성화)</button><div class="ct-done" id="cd">${d.done}</div><div class="ct-retry" id="cr">다시 해봐요! 잘못 분류한 항목이 있어요.</div><button class="ct-rst" id="srst" onclick="renderCT(${cti})">다시 풀기</button>`;
+  d.items.forEach((item,i)=>{
+    const div=document.createElement('div');div.className='sort-item';div.id='si'+i;
+    div.innerHTML=`<div class="sort-itxt">${item.t}</div><div class="sort-btns"><button class="sort-btn y" id="sy${i}" onclick="sp(${i},true)">필요</button><button class="sort-btn n" id="sn${i}" onclick="sp(${i},false)">불필요</button></div>`;
+    document.getElementById('sg').appendChild(div);
+  });
+  window.sp=(i,v)=>{
+    if(document.getElementById('sy'+i).disabled)return;
+    ans[i]=v;
+    document.getElementById('sy'+i).classList.toggle('act',v);
+    document.getElementById('sn'+i).classList.toggle('act',!v);
+    if(Object.keys(ans).length===d.items.length){
+      const btn=document.getElementById('sa');btn.classList.remove('dim');btn.textContent='확인하기';
+    }
+  };
+  window.ssVal=()=>{
+    if(Object.keys(ans).length<d.items.length)return;
+    let ok=true;
+    d.items.forEach((item,i)=>{
+      document.getElementById('sy'+i).disabled=true;document.getElementById('sn'+i).disabled=true;
+      const c=(ans[i]===item.ok);
+      document.getElementById('si'+i).classList.add(c?'ok':'no');
+      if(!c)ok=false;
+    });
+    document.getElementById('sa').style.display='none';
+    document.getElementById('srst').style.display='inline-block';
+    if(ok)document.getElementById('cd').style.display='block';
+    else document.getElementById('cr').style.display='block';
+  };
+}
+
+function ctPattern(d,intro){
+  let qi=0;
+  const pf=d.examples.map(e=>`<div class="pat-flow"><div class="pat-ftitle">${e.t}</div><div class="pat-step ps">${e.f[0]}</div><div class="pat-arrow">↓</div><div class="pat-step pj">${e.f[1]}</div><div class="pat-arrow">↓</div><div class="pat-step pa">${e.f[2]}</div></div>`).join('');
+  function rq(){
+    const q=d.qs[qi];
+    document.getElementById('ct-body').innerHTML=intro+`<div class="pat-flows">${pf}</div><div class="pat-q">${q.q}</div><div class="pat-opts">${q.o.map((o,i)=>`<button class="pat-opt" id="po${i}" onclick="pa(${i})">${o}</button>`).join('')}</div><div class="pat-ex" id="pe">${q.ex}</div><button class="pat-next" id="pn" onclick="pnext()">${qi<d.qs.length-1?'다음 질문 →':'완료!'}</button><div class="ct-done" id="cd" style="margin-top:10px">${d.done}</div>`;
+    window.pa=(i)=>{
+      document.querySelectorAll('.pat-opt').forEach(b=>b.disabled=true);
+      document.getElementById('po'+q.a).classList.add('ok');
+      if(i!==q.a)document.getElementById('po'+i).classList.add('no');
+      document.getElementById('pe').style.display='block';
+      document.getElementById('pn').style.display='block';
+    };
+    window.pnext=()=>{qi++;if(qi>=d.qs.length)document.getElementById('cd').style.display='block';else rq();};
+  }
+  rq();
+}
+
+function ctSeq(d,intro){
+  let order=[],done=false;
+  const idx=[...d.steps.keys()].sort(()=>Math.random()-.5);
+  document.getElementById('ct-body').innerHTML=intro+`<div class="seq-grid" id="sqg"></div><button class="ct-act dim" id="sqa" onclick="sqVal()">순서 확인하기 (모두 선택 후 활성화)</button><div class="ct-done" id="cd">${d.done}</div><div class="ct-retry" id="cr">아쉬워요! 빨간 항목의 순서가 틀렸어요.</div><button class="ct-rst" id="sqrst" onclick="renderCT(${cti})">다시 풀기</button>`;
+  idx.forEach(i=>{
+    const b=document.createElement('button');
+    b.className='seq-item';b.id='sq'+i;
+    b.innerHTML=`<div class="seq-num" id="sqn${i}"></div><span>${d.steps[i].t}</span>`;
+    b.onclick=()=>{
+      if(done||order.includes(i))return;
+      order.push(i);
+      document.getElementById('sqn'+i).textContent=order.length;
+      b.classList.add('picked');
+      if(order.length===d.steps.length){
+        const btn=document.getElementById('sqa');btn.classList.remove('dim');btn.textContent='순서 확인하기';
+      }
+    };
+    document.getElementById('sqg').appendChild(b);
+  });
+  window.sqVal=()=>{
+    if(order.length<d.steps.length)return;
+    done=true;let ok=true;
+    order.forEach((si,ci)=>{
+      const b=document.getElementById('sq'+si);b.disabled=true;
+      const c=(ci+1)===d.steps[si].ord;
+      b.classList.remove('picked');b.classList.add(c?'ok':'no');
+      if(!c)ok=false;
+    });
+    document.getElementById('sqa').style.display='none';
+    document.getElementById('sqrst').style.display='inline-block';
+    if(ok)document.getElementById('cd').style.display='block';
+    else document.getElementById('cr').style.display='block';
+  };
+}
+
+// ── Quiz ───────────────────────────────────────────────────────
+const QZ=[
+  {ty:'어떤 센서일까?',q:'어두운 골목에 사람이 다가오면 자동으로 불이 켜진다. 어떤 센서를 사용했을까?',h:'낮에는 사람이 지나가도 안 켜지는 이유도 생각해봐!',o:['조도 + 움직임 센서','초음파 센서','온도 센서','GPS 센서'],a:0,ex:'밝기(조도 센서)와 움직임(PIR 센서) 두 가지를 함께 확인해요. 낮에는 밝기 조건이 맞지 않아 켜지지 않아요!',f:['조도+움직임 감지\n밝기 낮고 사람 접근','어둡고 움직임 있나?\n두 조건 모두 충족','전등 켜기\n일정 시간 후 꺼짐']},
+  {ty:'컴퓨팅 사고력: 문제 분해',q:'"버스 정류장 대기 문제"를 문제 분해할 때 해당하지 않는 것은?',h:'문제 해결에 실제로 도움이 되는 것인지 생각해봐!',o:['버스 도착 정보를 알 수 없다','앉을 자리가 부족하다','비를 피할 공간이 없다','버스 색깔이 마음에 안 든다'],a:3,ex:'"버스 색깔"은 기다리는 불편함과 직접 관련이 없어요. 문제 분해는 해결해야 할 핵심 문제만 골라내는 거예요!',f:['문제 상황 파악\n버스 기다림 불편','핵심 문제만 분리\n색깔은 무관','각 문제를 하나씩\nSW로 해결']},
+  {ty:'컴퓨팅 사고력: 추상화',q:'스마트 쓰레기통 프로그램에서 "추상화"로 제거해야 할 불필요한 정보는?',h:'초음파 센서는 오직 높이만 잰다는 걸 기억해봐!',o:['현재 쓰레기 높이','가득 찬 기준값 (90%)','쓰레기를 버린 사람 이름','관리자 연락처'],a:2,ex:'쓰레기통 프로그램은 높이만 재면 돼요. 누가 버렸는지는 필요 없어요. 이렇게 핵심만 남기는 것이 추상화예요!',f:['초음파로 높이 감지\n필요: 높이·기준·연락처','불필요 정보 제거\n이름·기온 등 무시','간단한 프로그램\n핵심 정보만 처리']},
+  {ty:'컴퓨팅 사고력: 패턴 인식',q:'센서등, 스마트 에어컨, 화재 스프링클러의 공통 패턴은?',h:'',o:['모두 카메라를 사용한다','모두 감지 → 기준 비교 → 자동 실행 구조다','모두 인터넷이 필요하다','모두 경고음을 낸다'],a:1,ex:'"감지 → 기준값 비교 → 자동 실행" 구조가 세 사례 모두에서 나타나요. 이 패턴 하나로 수많은 SW를 만들 수 있어요!',f:['감지\n센서로 정보 수집','기준 비교\n판단 조건 확인','자동 실행\n동작 수행']},
+  {ty:'컴퓨팅 사고력: 알고리즘',q:'무단투기 감지 프로그램의 올바른 순서는?',h:'어떤 정보를 먼저 알아야 다음 단계로 갈 수 있는지 생각해봐!',o:['움직임 감지 → 야간 확인 → 조건 판단 → 경고·촬영·알림','알림 전송 → 촬영 → 경고 → 조건 판단 → 야간 확인 → 감지','야간 확인 → 움직임 감지 → 촬영 → 조건 판단 → 경고 → 알림','조건 판단 → 야간 확인 → 움직임 감지 → 경고 → 촬영 → 알림'],a:0,ex:'감지 먼저, 그 다음 조건 판단, 마지막에 실행! 순서가 바뀌면 프로그램이 오작동해요.',f:['움직임+야간 감지\n정보 수집','야간+움직임 있나?\n조건 판단','경고+촬영+알림\n순서대로 실행']},
+  {ty:'같은 센서 찾기',q:'초음파 센서가 쓰이지 않는 것은?',h:'초음파 센서는 소리로 거리를 잰다는 걸 기억해봐!',o:['비접촉 체온계','자동차 주차 후방 감지','드론 장애물 회피','스마트 쓰레기통'],a:0,ex:'비접촉 체온계는 적외선(열)을 감지하는 센서를 사용해요. 나머지는 모두 초음파로 거리를 측정합니다.',f:['비접촉 체온계\n적외선 센서 사용','피부 열(적외선)\n온도로 변환','체온 표시\n초음파 아님!']},
+  {ty:'핵심 원리',q:'PIR 센서가 실제로 감지하는 것은 무엇일까?',h:'PIR = Passive Infrared, 적외선은 열과 관련이 있어!',o:['사람 몸에서 나오는 열(적외선)','소리의 크기','빛의 세기','물체의 무게'],a:0,ex:'PIR은 "Passive Infrared"의 줄임말이에요. 사람 몸에서 나오는 열(적외선)의 변화를 감지합니다.',f:['PIR 센서\n적외선 열 감지','열 분포 변화 있나?\n움직임 = 있음','경보·조명 등\n설정에 따라 동작']},
+  {ty:'어떤 센서일까?',q:'자동차가 주차할 때 벽에 가까워질수록 "삐삐" 소리가 빠르게 난다. 어떤 센서일까?',h:'',o:['초음파 센서','PIR 적외선 센서','온도 센서','압력 센서'],a:0,ex:'초음파를 쏘고 돌아오는 시간으로 거리를 잽니다. 가까울수록 돌아오는 시간이 짧아요!',f:['초음파 발사\n소리가 벽에 반사됨','벽까지 거리 계산\n거리 < 기준값?','경고음 속도 빨라짐\n가까울수록 빠르게']},
+  {ty:'핵심 개념',q:'같은 초음파 센서가 주차 보조기도, 쓰레기통 감지기도 될 수 있는 이유는?',h:'',o:['프로그램(코드)이 다르기 때문','센서의 색깔이 달라서','크기가 달라서','가격이 비싸서'],a:0,ex:'센서는 같은 정보(거리)를 제공합니다. 그 정보로 무엇을 할지 결정하는 것이 프로그래밍이에요!',f:['같은 초음파 센서\n거리 정보 제공','프로그램이 다름\n판단 기준 다름','완전히 다른 제품\n주차감지 vs 쓰레기통']},
+  {ty:'감지 → 판단 → 실행',q:'다음 중 "실행" 단계에 해당하는 것은?',h:'실행은 판단 결과에 따라 실제로 무언가를 하는 단계야!',o:['전등 켜기','움직임이 감지됨','거리가 50cm보다 작음','센서값 읽기'],a:0,ex:'"전등 켜기"는 판단 결과에 따라 실제 동작을 수행하는 실행 단계예요. 감지=정보수집, 판단=조건확인, 실행=동작!',f:['움직임 감지됨\n(감지 단계)','어둡고 움직임 있나?\n(판단 단계)','전등 켜기\n(실행 단계)']}
+];
+let qi=0,qs=0,qa=false;
+function startQuiz(){qi=0;qs=0;qa=false;document.getElementById('qz-main').style.display='block';document.getElementById('qz-final').style.display='none';renderQ();}
+function renderQ(){
+  if(qi>=QZ.length){showFinal();return;}
+  const q=QZ[qi];qa=false;
+  document.getElementById('qbar').style.width=(qi/QZ.length*100)+'%';
+  document.getElementById('qsc').textContent=qs+'점';
+  document.getElementById('qnum').textContent=`문제 ${qi+1} / ${QZ.length}`;
+  document.getElementById('qtype').textContent=q.ty;
+  document.getElementById('qtxt').textContent=q.q;
+  const h=document.getElementById('qhint');h.textContent=q.h?'힌트: '+q.h:'';h.style.display=q.h?'block':'none';
+  document.getElementById('opts').innerHTML=q.o.map((o,i)=>`<button class="opt" onclick="answer(${i})">${o}</button>`).join('');
+  document.getElementById('reveal').classList.remove('on');
+  document.getElementById('next-btn').style.display='none';
+}
+function answer(i){
+  if(qa)return;qa=true;
+  const q=QZ[qi];
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  document.querySelectorAll('.opt')[i].classList.add(i===q.a?'ok':'no');
+  if(i===q.a)qs+=10;else document.querySelectorAll('.opt')[q.a].classList.add('ok');
+  document.getElementById('rv-ex').textContent=q.ex;
+  document.getElementById('mflow').innerHTML=q.f.map((f,k)=>(k>0?'<div class="mf-sep">→</div>':'')+`<div class="mf ${['bl','am','gr'][k]}"><div class="mf-lbl">${['감지','판단','실행'][k]}</div><div class="mf-txt">${f}</div></div>`).join('');
+  document.getElementById('reveal').classList.add('on');
+  document.getElementById('next-btn').style.display='block';
+  document.getElementById('qbar').style.width=((qi+1)/QZ.length*100)+'%';
+  document.getElementById('qsc').textContent=qs+'점';
+}
+function nextQ(){qi++;renderQ();}
+function showFinal(){
+  document.getElementById('qz-main').style.display='none';document.getElementById('qz-final').style.display='block';
+  document.getElementById('f-sc').textContent=qs;document.getElementById('f-dn').textContent='/ '+(QZ.length*10)+'점';
+  const pct=qs/(QZ.length*10);
+  const[[,m,s]]=[[.9,'완벽해요!','컴퓨팅 사고력 달인! SW 캠프 최강자'],[.7,'잘했어요!','센서와 사고력을 잘 이해하고 있네요'],[.5,'좋아요!','컴퓨팅 사고력 섹션을 한 번 더 해봐요'],[0,'다시 도전!','예시와 실습을 다시 보고 도전해봐요']].filter(([t])=>pct>=t);
+  document.getElementById('f-msg').textContent=m;document.getElementById('f-sub').textContent=s;
+}
+renderEx(0);renderSen(0);renderCT(0);
+</script>
+</body>
+</html>
